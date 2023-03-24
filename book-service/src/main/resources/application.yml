@@ -14,7 +14,7 @@ spring:
     show-sql: true # In production disable this because it wastes performance.
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL5Dialect
+        dialect: org.hibernate.dialect.MySQL8Dialect
   jackson:
     default-property-inclusion: NON_NULL
     serialization:
