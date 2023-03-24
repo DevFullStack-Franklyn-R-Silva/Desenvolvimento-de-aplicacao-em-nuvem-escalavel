@@ -3,18 +3,42 @@ package com.github.hadesfranklyn.project.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class Cambio implements Serializable{
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Transient;
+
+@Entity(name = "cambio")
+public class Cambio implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
+	@Column(name = "from_currency", nullable = false, length = 3)
 	private String from;
+
+	@Column(name = "to_currency", nullable = false, length = 3)
 	private String to;
-	private BigDecimal conversionFactor; 
+
+	@Column(nullable = false)
+	private BigDecimal conversionFactor;
+
+	/*
+	 * can use standard DTO(Data Transfer Object) instead of this annotation
+	 * "@Transient"
+	 */
+	@Transient
 	private BigDecimal convertedValue;
+
+	@Transient
 	private String environment;
-	
-	// constructors
+
+	// constructor
 	public Cambio() {
 	}
 
@@ -27,6 +51,7 @@ public class Cambio implements Serializable{
 		this.convertedValue = convertedValue;
 		this.environment = environment;
 	}
+
 	// get and set
 	public Long getId() {
 		return id;
@@ -131,6 +156,5 @@ public class Cambio implements Serializable{
 			return false;
 		return true;
 	}
-	
-	
+
 }
