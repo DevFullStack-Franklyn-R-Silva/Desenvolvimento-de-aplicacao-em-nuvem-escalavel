@@ -7,13 +7,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+
+@Tag(name = "Foo bar")
 @RestController
 @RequestMapping("book-service")
 public class FooBarController {
 
 	private Logger logger =LoggerFactory.getLogger(FooBarController.class);
 	
+	@Operation(summary = "Foo bar")
 	@GetMapping("/foo-bar")
 	@Bulkhead(name = "default")
 	public String fooBar() {
