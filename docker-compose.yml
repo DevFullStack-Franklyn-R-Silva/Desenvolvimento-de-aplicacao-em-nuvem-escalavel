@@ -1,14 +1,30 @@
 version: '3.4'
 
 services:
-#docker run -p 9411:9411 openzipkin:2.23.2
+# ZIPKIN
   zipkin-server:
     image: openzipkin/zipkin:2.23.2
+    restart: always
     ports:
       - 9411:9411
+    depends_on:
+      - rabbit-mq
+    environment:
+      RABBIT_URI: amqp://guest:guest@rabbit-mq:5672
     networks:
       - hadesfranklyn-network
 
+# RABBIT
+  rabbit-mq:
+    image: rabbitmq:3.8.14-management
+    restart: always
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - hadesfranklyn-network
+
+# CAMBIO DATABASE
   cambio-db:
     image: mysql:8.0.32
     command: --default-authentication-plugin=mysql_native_password
@@ -27,7 +43,8 @@ services:
       - 3308
     networks:
       - hadesfranklyn-network
-      
+
+# BOOK DATABASE
   book-db:
     image: mysql:8.0.32
     command: --default-authentication-plugin=mysql_native_password
@@ -54,18 +71,25 @@ services:
     networks:
       - hadesfranklyn-network
 
+# API GATEWAY
   api-gateway:
     image: hadesfranklyn/api-gateway:0.0.1-SNAPSHOT
+    restart: always
     ports:
       - 8765:8765
     depends_on:
       - naming-server
+      - rabbit-mq
     networks:
       - hadesfranklyn-network
     environment:
       EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
       SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
+      RABBIT_URI: amqp://guest:guest@rabbit-mq:5672
+      SPRING_RABBITMQ_HOST: rabbit-mq
+      SPRING_ZIPKIN_SENDER_TYPE: rabbit
 
+# CAMBIO SERVICE
   cambio-service:
     image: hadesfranklyn/cambio-service
     restart: always
@@ -82,14 +106,19 @@ services:
       SPRING.FLYWAY.URL: jdbc:mysql://cambio-db:3308/cambio_service?useSSL=false&&serverTimezone=UTC&enabledTLSProtocols=TLSv1.2
       SPRING.FLYWAY.USER: root
       SPRING.FLYWAY.PASSWORD: root
+      RABBIT_URI: amqp://guest:guest@rabbit-mq:5672
+      SPRING_RABBITMQ_HOST: rabbit-mq
+      SPRING_ZIPKIN_SENDER_TYPE: rabbit
     ports:
       - 8000:8000
     depends_on:
       - naming-server
       - cambio-db
+      - rabbit-mq
     networks:
       - hadesfranklyn-network
 
+# BOOK SERVICE
   book-service:
     image: hadesfranklyn/book-service
     restart: always
@@ -106,11 +135,15 @@ services:
       SPRING.FLYWAY.URL: jdbc:mysql://book-db:3310/book_service?useSSL=false&&serverTimezone=UTC&enabledTLSProtocols=TLSv1.2
       SPRING.FLYWAY.USER: root
       SPRING.FLYWAY.PASSWORD: root
+      RABBIT_URI: amqp://guest:guest@rabbit-mq:5672
+      SPRING_RABBITMQ_HOST: rabbit-mq
+      SPRING_ZIPKIN_SENDER_TYPE: rabbit
     ports:
       - 8100:8100
     depends_on:
       - naming-server
       - book-db
+      - rabbit-mq
     networks:
       - hadesfranklyn-network
 
