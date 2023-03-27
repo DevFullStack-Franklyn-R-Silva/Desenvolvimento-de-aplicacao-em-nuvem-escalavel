@@ -10,7 +10,7 @@ services:
       - hadesfranklyn-network
 
   cambio-db:
-    image: mysql:5.7.22
+    image: mysql:8.0.32
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
@@ -29,7 +29,7 @@ services:
       - hadesfranklyn-network
       
   book-db:
-    image: mysql:5.7.22
+    image: mysql:8.0.32
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
@@ -65,7 +65,7 @@ services:
     environment:
       EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
       SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
-      
+
   cambio-service:
     image: hadesfranklyn/cambio-service
     restart: always
@@ -76,10 +76,10 @@ services:
       TZ: America/Sao_Paulo
       EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
       SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
-      SPRING.DATASOURCE.URL: jdbc:mysql://localhost:3306/cambio_service?useTimezone=true&serverTimezone=UTC
+      SPRING.DATASOURCE.URL: jdbc:mysql://cambio-db:3308/cambio_service?useSSL=false&&serverTimezone=UTC&enabledTLSProtocols=TLSv1.2
       SPRING.DATASOURCE.USERNAME: root
       SPRING.DATASOURCE.PASSWORD: root
-      SPRING.FLYWAY.URL: jdbc:mysql://localhost:3306/cambio_service?useTimezone=true&serverTimezone=UTC
+      SPRING.FLYWAY.URL: jdbc:mysql://cambio-db:3308/cambio_service?useSSL=false&&serverTimezone=UTC&enabledTLSProtocols=TLSv1.2
       SPRING.FLYWAY.USER: root
       SPRING.FLYWAY.PASSWORD: root
     ports:
@@ -89,7 +89,31 @@ services:
       - cambio-db
     networks:
       - hadesfranklyn-network
-      
+
+  book-service:
+    image: hadesfranklyn/book-service
+    restart: always
+    build:
+      context: .
+      dockerfile: book-service/Dockerfile
+    environment:
+      TZ: America/Sao_Paulo
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
+      SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
+      SPRING.DATASOURCE.URL: jdbc:mysql://book-db:3310/book_service?useSSL=false&&serverTimezone=UTC&enabledTLSProtocols=TLSv1.2
+      SPRING.DATASOURCE.USERNAME: root
+      SPRING.DATASOURCE.PASSWORD: root
+      SPRING.FLYWAY.URL: jdbc:mysql://book-db:3310/book_service?useSSL=false&&serverTimezone=UTC&enabledTLSProtocols=TLSv1.2
+      SPRING.FLYWAY.USER: root
+      SPRING.FLYWAY.PASSWORD: root
+    ports:
+      - 8100:8100
+    depends_on:
+      - naming-server
+      - book-db
+    networks:
+      - hadesfranklyn-network
+
 networks:
   hadesfranklyn-network:
     driver: bridge
