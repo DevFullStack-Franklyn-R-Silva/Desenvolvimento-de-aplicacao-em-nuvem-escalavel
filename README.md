@@ -50,6 +50,8 @@ Flyway: É uma biblioteca de migração de banco de dados que permite que os des
 
 Zipkin: É uma biblioteca que fornece recursos de rastreamento distribuído usando o Zipkin, um sistema de rastreamento distribuído de código aberto. Ele permite que os desenvolvedores vejam o caminho de execução de uma solicitação em todos os serviços envolvidos em uma interface visual. Com a utilização da biblioteca Zipkin, torna-se mais fácil detectar gargalos em sistemas distribuídos, pois é possível identificar quais serviços estão consumindo mais recursos ou causando lentidão na transação. Além disso, a biblioteca permite a identificação de erros em um ambiente distribuído, tornando mais fácil a depuração e resolução de problemas. Informações sobre o Zipkin podem ser encontradas: [Clicando aqui](https://zipkin.io/)
 
+<img align="center" alt="Frank-gif" height="600" width="800" src="/imgs/image9.jpeg">
+
 <img align="center" alt="Frank-gif" height="600" width="800" src="/imgs/image8.jpeg">
 
 ## Arquitetura
